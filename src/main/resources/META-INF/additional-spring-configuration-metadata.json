@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "max.tree.node.depth",
+  "type": "java.lang.String",
+  "description": "Limite massimo ricerca nell'albero di nodi"
+}]}

@@ -1,0 +1,11 @@
+- il terzo esercizio richiede la connessione al database. 
+- Quindi ho dovuto inserire JPA al progetto
+- ho dovuto anche aggiungere swagger per testare i servizi rest
+- Ho sviluppato i metodi
+- Ho fatto una bozza di test per chiamare i vari metodi. Purtoppo ricordo cosa devo fare ma non mi ricordo più quale è il metodo per farli
+Avrei dovuto fare dei test end2end per verificare il CRUD dei dati sul prodotto. Purtroppo non ricordo più come creare lo scenario e testare i dati inseriti.
+Quindi ho solo testato lo stato http dei servizi che ho potuto simulare.
+Mancano invece i test unitari, perchè non ho più tempo da dedicare all'attività. Cmq avrei dovuto testare il funzionamento delle query...
+sui service direi che c'è poco da testare, di fatto effettuano solo la conversione tra i risultato della query e l'output, ma per essere precisi avrei dovuto fare anche quello.
+
+Anche in questo caso ho fatto una gestione di log ed eccezioni non curata per mancanza di tempo
