@@ -1,5 +1,6 @@
 package it.exercises.test;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -29,12 +30,12 @@ import it.exercises.service.ProductService;
 class TestExercise3 {
 	@Autowired
 	private MockMvc mockMvc;
+
 	@MockBean
-	private ProductRepository repo;
+	private ProductService productService;
 	
 	@MockBean
-	private ProductService service;
-	
+	private ProductRepository productRepository;
 	
 	@BeforeTestClass
 	void createScenario() {
@@ -58,10 +59,27 @@ class TestExercise3 {
 		this.mockMvc.perform(get("/products/getProductByCategory/CAT1")).andExpect(status().isOk());
 	}
 	@Test
+	void getAllProductById200() throws Exception {
+		Product p=fillProduct();
+		when(productService.getProductById(1)).thenReturn(p);
+		this.mockMvc.perform(get("/products/getProductById/1")).andExpect(status().isOk()).andReturn().equals(p);
+	}
+	private Product fillProduct() {
+		Product p= new Product();
+		p.setCategory(Category.CAT1);
+		p.setDescription("desc");
+		p.setPrice(10.0);
+		p.setQuantity(1);
+		p.setProductId(1);
+		return p;
+	}
+	
+	@Test
 	void getAllProductById404() throws Exception {
-		
+	//	when(productService.getProductById(1)).thenReturn(new Product());
 		this.mockMvc.perform(get("/products/getProductById/1")).andExpect(status().isNotFound());
 	}
+	
 	@Test
 	void getSaveProduct() throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
@@ -108,7 +126,7 @@ class TestExercise3 {
 		
 	
 	private Product fillProductIo(int id, Category cat, String description, double price, int quantity) {
-		Product p=new Product();
+		Product p=fillProduct();
 		p.setProductId(id);
 		p.setCategory(cat);
 		p.setDescription(description);

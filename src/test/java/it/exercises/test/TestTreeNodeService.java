@@ -33,7 +33,7 @@ public class TestTreeNodeService {
 	
 	@Test
 	public void testNullCategory() throws Exception {
-		TreeNode tree=null;
+		TreeNode tree=new TreeNode();
 	    List<Category> retvalue=service.findAllDescendantsBy(null, tree);
 	    assertTrue(retvalue.isEmpty());
 	}
