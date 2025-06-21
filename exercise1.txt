@@ -1,8 +1,0 @@
-- Ho creato un package con gli oggetti dell'esercizio, Product Category e TreeNode.
-- Ho creato un service con l'operazione di ricerca nell'albero del treenode (TreeNodeService).
-- Visto che era più semplice capire quali fossero le casistiche da testare facendo direttamente i test ho creato  una classe di test (TestTreeNodeService) 
-- ho sviluppato il servizio in base alle casistiche di test, in modo da intercettare gli errori su campi null o su parti della navigazione non chiare.
-- siccome ho dovuto creare dei metodi ricorsivi per gestire il problema ho dovuto inserire una proprietà per evitare che la ricorsione diventasse infinita. L'ho impostata a 3.
-- Ho verificato che se a seconda della posizione della prima occorrenza della categoria nell'albero (ho messo CAT1 primo livello, CAT2 secondo e CAT3 terzo) il numero di categorie estratte fosse quello previsto.
-- ho verificato che al superamento di 3 livelli il service smette di contare le categorie. Non ho impostato un eccezione per questo tipo di gestione.
-- Non ho inserito un logger, essendo questo un esercizio. Ma ipotizzo che almeno nelle situazioni impreviste vada messo.

@@ -1,6 +1,0 @@
-- Sono partito dallo scenario creato nell'eseerizio 1
-- Ho creato un nuovo service per l'operazione (CalculateAmountProductService).
-- Ho creato il metodo. Dovendo il metodo restituire un double ho pensato di dover generare un eccezione in caso di nullpointer exception
-- Come temevo il double crea problemi con gli arrodondamenti, infatti il test con la somma dava errore. Per ovviare al problema ho fatto le operazioni con i BigDecimal, le ho arrotondate e  poi le ho riconvertite in double.
-- Come test ho messo le 3 casistiche di un prodotto ok, 2 prodotti Ok e nessun prodotto Ok. Altre combinazioni rientrano in queste casistiche.
-
