@@ -1,12 +1,10 @@
 package it.exercises.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.Locale.Category;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,25 +22,24 @@ import org.springframework.test.context.event.annotation.BeforeTestClass;
 import org.springframework.test.context.jdbc.Sql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import it.exercises.ProductCategoryApplication;
-import it.exercises.interfaces.IProductService;
-import it.exercises.model.io.Category;
-import it.exercises.model.io.Product;
-import it.exercises.repository.ProductRepository;
+import it.exercises.UserApplication;
+import it.exercises.interfaces.IUserService;
+import it.exercises.model.io.User;
+import it.exercises.repository.UserRepository;
+import jakarta.persistence.Column;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = ProductCategoryApplication.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = UserApplication.class)
 class TestExerciseIntegration {
     @LocalServerPort
     private int port;	
 
 	@Autowired
-	private IProductService productService;
+	private IUserService userService;
 	
 	@Autowired
-	private ProductRepository productRepository;
+	private UserRepository userRepository;
 	@Autowired
     private TestRestTemplate restTemplate;
 	private static HttpHeaders headers;
@@ -56,67 +53,74 @@ class TestExerciseIntegration {
     }
 	@BeforeTestClass
 	void createScenario() {
-		productService.addProduct(fillProduct());
+		userService.addUser(MockObjects.fillUser());
 	}
+	
+	@Column(name = "id_user")
+	//nome, cognome, mail e indirizzo
+	private int userId;
+	@Column(name = "name")
+	private String name;
+	@Column(name = "surname")
+	
+	private String surname;
+	@Column(name = "mail")
+	private String mail;
+	@Column(name = "address")
+	private String address;
+
+	@Column(name = "date_update")
 	private String createURLWithPort(String path) {
         return "http://localhost:" + port + path;
     }
 	@Test
-	@Sql(statements = "INSERT INTO product(id_product, description, quantity, price) VALUES (1, 'test',  1, 1.1)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-	@Sql(statements = "INSERT INTO product(id_product, description, quantity, price) VALUES (2, 'test2',  1, 1.1)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-	@Sql(statements = "DELETE FROM product WHERE id_product in (1,2) ", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-	public void testOrdersList() {
-	    HttpEntity<String> entity = new HttpEntity<>(null, headers);
-	    ResponseEntity<List<Product>> response = restTemplate.exchange(
-	            createURLWithPort("/products/getAll"), HttpMethod.GET, entity, new ParameterizedTypeReference<List<Product>>(){});
-	    List<Product> orderList = response.getBody();
+	@Sql(statements = "INSERT INTO users(id_user, name, surname, mail, address) VALUES (1, 'name1',  'surname1', 'mail@mail1.it', 'indirizzo1')", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+	@Sql(statements = "INSERT INTO users(id_user, name, surname, mail, address) VALUES (2, 'name2',  'surname2', 'mail@mail2.it', 'indirizzo2')", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+	@Sql(statements = "DELETE FROM users WHERE id_user in (1,2) ", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+	public void testUsersList() {
+	    HttpEntity<User> entity = new HttpEntity<>(new User(), headers);
+	    ResponseEntity<List<User>> response = restTemplate.exchange(
+	            createURLWithPort("/users/findByCondition"), HttpMethod.POST, entity, new ParameterizedTypeReference<List<User>>(){});
+	    List<User> orderList = response.getBody();
 	    assert orderList != null;
 	    assertTrue(response.getStatusCode().is2xxSuccessful());
-	    assertEquals(orderList.size(), productService.getAll().size());
-	    assertEquals(orderList.size(), productRepository.findAll().size());
+	    assertEquals(orderList.size(), userService.getByCondition(new User()).size());
+	    assertEquals(orderList.size(), userRepository.findAll().size());
 	}
+	//TODO ci sarebbero da fare i test anche per le varie condizioni di ricerca. 
 	
 	@Test
-	void getSaveProduct() throws Exception {
+	void getSaveUser() throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-	   
-	    HttpEntity<Product> entity = new HttpEntity<>(fillProductIo(10,Category.CAT1,"prodotto 10", 10.0, 1), headers);
-	    ResponseEntity<Product> response = restTemplate.exchange(
-	            createURLWithPort("/products/addProduct"), HttpMethod.POST, entity, new ParameterizedTypeReference<Product>(){});
+	    int id = 10;
+	    String mail2 = "mail10@mail.it";
+	    String surname2 = "cognome10";
+		String name2 = "nome10";
+		String address2 = "indirizzo10";
+		
+		HttpEntity<User> entity = new HttpEntity<>(MockObjects.fillUserIo(id,mail2,surname2,name2 , address2), headers);
+	    ResponseEntity<User> response = restTemplate.exchange(
+	            createURLWithPort("/users/addUser"), HttpMethod.POST, entity, new ParameterizedTypeReference<User>(){});
 	 
-	    Product product = response.getBody();
-	    assert product != null;
+	    User user = response.getBody();
+	    assert user != null;
 	    assertTrue(response.getStatusCode().is2xxSuccessful());
-	    Product p=productService.getProductById(10);
-	    assertEquals(p.getPrice(), 10.0);
-	    assertEquals(p.getQuantity(), 1);
-	    assertEquals(p.getProductId(), 10);
+	    User p=userService.getUserById(id);
+	    assertEquals(p.getAddress(), address2);
+	    assertEquals(p.getName(), name2);
+	    assertEquals(p.getSurname(), surname2);
+	    assertEquals(p.getMail(), mail2);
+	    assertEquals(p.getUserId(), id);
 		
 		
 	}
 	
 	
-	private Product fillProduct() {
-		Product p= new Product();
-		p.setCategory(Category.CAT1);
-		p.setDescription("desc");
-		p.setPrice(10.0);
-		p.setQuantity(1);
-		p.setProductId(1);
-		return p;
-	}
+	
 	
 		
 	
-	private Product fillProductIo(int id, Category cat, String description, double price, int quantity) {
-		Product p=fillProduct();
-		p.setProductId(id);
-		p.setCategory(cat);
-		p.setDescription(description);
-		p.setPrice(price);
-		p.setQuantity(quantity);
-		return p;
-	}
+	
 	
 }

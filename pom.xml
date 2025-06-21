@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.0</version>
+		<version>3.3.12</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>it.exercises</groupId>
-	<artifactId>productcategory</artifactId>
+	<artifactId>user</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>productcategory</name>
-	<description>Gestione prodotti categorie</description>
+	<description>Gestione utente</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>

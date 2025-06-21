@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Locale.Category;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,120 +21,115 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import it.exercises.ProductCategoryApplication;
-import it.exercises.model.io.Category;
-import it.exercises.model.io.Product;
-import it.exercises.repository.ProductRepository;
-import it.exercises.service.ProductService;
+import it.exercises.UserApplication;
+import it.exercises.model.io.User;
+import it.exercises.repository.UserRepository;
+import it.exercises.service.UserService;
 
-@SpringBootTest(classes = ProductCategoryApplication.class)
+@SpringBootTest(classes = UserApplication.class)
 @AutoConfigureMockMvc
 class TestExercise3 {
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockBean
-	private ProductService productService;
+	private UserService userService;
 	
 	@MockBean
-	private ProductRepository productRepository;
+	private UserRepository userRepository;
 	
 	@BeforeTestClass
 	void createScenario() {
 	
 	}
 	@Test
-	void getAllProducts() throws Exception {
+	void getAllUsers() throws Exception {
 		
-		this.mockMvc.perform(get("/products/getAll")).andExpect(status().isOk());
+		this.mockMvc.perform(get("/users/getAll")).andExpect(status().isOk());
+	}
+	
+	
+	@Test
+	void getAllUserById200() throws Exception {
+		User p=MockObjects.fillUser();
+		when(userService.getUserById(1)).thenReturn(p);
+		this.mockMvc.perform(get("/users/getUserById/1")).andExpect(status().isOk()).andReturn().equals(p);
+	}
+	
+	
+	@Test
+	void getAllUserById404() throws Exception {
+	//	when(userService.getUserById(1)).thenReturn(new User());
+		this.mockMvc.perform(get("/users/getUserById/1")).andExpect(status().isNotFound());
 	}
 	
 	@Test
-	void getAllProductsGroupByCategory() throws Exception {
-		
-		this.mockMvc.perform(get("/products/getAllGrouped")).andExpect(status().isOk());
-	}
-	
-	@Test
-	void getProductsByCategory() throws Exception {
-		
-		this.mockMvc.perform(get("/products/getProductByCategory/CAT1")).andExpect(status().isOk());
-	}
-	@Test
-	void getAllProductById200() throws Exception {
-		Product p=fillProduct();
-		when(productService.getProductById(1)).thenReturn(p);
-		this.mockMvc.perform(get("/products/getProductById/1")).andExpect(status().isOk()).andReturn().equals(p);
-	}
-	private Product fillProduct() {
-		Product p= new Product();
-		p.setCategory(Category.CAT1);
-		p.setDescription("desc");
-		p.setPrice(10.0);
-		p.setQuantity(1);
-		p.setProductId(1);
-		return p;
-	}
-	
-	@Test
-	void getAllProductById404() throws Exception {
-	//	when(productService.getProductById(1)).thenReturn(new Product());
-		this.mockMvc.perform(get("/products/getProductById/1")).andExpect(status().isNotFound());
-	}
-	
-	@Test
-	void getSaveProduct() throws Exception {
+	void getSaveUser() throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(fillProductIo(10,Category.CAT1,"prodotto 10", 10.0, 1) );
-		this.mockMvc.perform(post("/products/addProduct").contentType(MediaType.APPLICATION_JSON).content(requestJson))
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mail@mail.it","cognome", "nome","indirizzo") );
+		this.mockMvc.perform(post("/users/addUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
         .andExpect(status().isOk());
 		
 		
 	}
 	
 	@Test
-	void getSaveProduct412Qta() throws Exception {
+	void getSaveUser412Mail() throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(fillProductIo(10,Category.CAT1,"prodotto 10", 10.0, -1) );
-		this.mockMvc.perform(post("/products/addProduct").contentType(MediaType.APPLICATION_JSON).content(requestJson))
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mailmail.it","cognome", "nome","indirizzo") );
+		this.mockMvc.perform(post("/users/addUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
         .andExpect(status().isPreconditionFailed());
 		
 		
 	}
 	@Test
-	void getSaveProduct412Price() throws Exception {
+	void getSaveUser412Surname() throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(fillProductIo(10,Category.CAT1,"prodotto 10", -10.0, 1) );
-		this.mockMvc.perform(post("/products/addProduct").contentType(MediaType.APPLICATION_JSON).content(requestJson))
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mail@mail.it","A".repeat(101),"nome","indirizzo") );
+		this.mockMvc.perform(post("/users/addUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
         .andExpect(status().isPreconditionFailed());
 		
 		
 	}
 	@Test
-	void updateSaveProduct404() throws Exception {
+	void getSaveUser412Name() throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(fillProductIo(10,Category.CAT1,"prodotto 10", 10.0, 1) );
-		this.mockMvc.perform(put("/products/updateProduct").contentType(MediaType.APPLICATION_JSON).content(requestJson))
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mail@mail.it","cognome","A".repeat(101),"indirizzo") );
+		this.mockMvc.perform(post("/users/addUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
+        .andExpect(status().isPreconditionFailed());
+		
+		
+	}
+	@Test
+	void getSaveUser412Address() throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mail@mail.it","cognome","nome","A".repeat(501)) );
+		this.mockMvc.perform(post("/users/addUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
+        .andExpect(status().isPreconditionFailed());
+		
+		
+	}
+	@Test
+	void updateSaveUser404() throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mail@mail.it","cognome", "nome","indirizzo") );
+		this.mockMvc.perform(put("/users/updateUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
         .andExpect(status().isNotFound());
 	}
 		
 	
-	private Product fillProductIo(int id, Category cat, String description, double price, int quantity) {
-		Product p=fillProduct();
-		p.setProductId(id);
-		p.setCategory(cat);
-		p.setDescription(description);
-		p.setPrice(price);
-		p.setQuantity(quantity);
-		return p;
-	}
+	
 	
 }
