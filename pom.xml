@@ -11,7 +11,7 @@
 	<groupId>it.exercises</groupId>
 	<artifactId>user</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>productcategory</name>
+	<name>userCrud</name>
 	<description>Gestione utente</description>
 	<properties>
 		<java.version>17</java.version>

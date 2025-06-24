@@ -4,17 +4,18 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import it.exercises.model.io.User;
+import it.exercises.model.io.UserIn;
+import it.exercises.model.io.UserOut;
 
 @Service
 public interface IUserService {
 	
-		public User addUser(User user);
+		public UserOut addUser(UserIn user);
 	
-		public List<User> getByCondition(User user);
+		public List<UserIn> getByCondition(UserIn user);
 	
-		public User getUserById(int userId);
+		public UserOut getUserById(long userId);
 	
-		public User updateUser(User user);
+		public UserOut updateUser(UserIn user, long userId);
 	
 }

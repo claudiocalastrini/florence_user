@@ -9,20 +9,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
-public class User {
+public class UserIn {
 	
-	private int userId;
+
 	private String name;
 	private String surname;
 	private String mail;
 	private String address;
 	
-	public int getUserId() {
-		return userId;
-	}
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
+	
 	public String getName() {
 		return name;
 	}

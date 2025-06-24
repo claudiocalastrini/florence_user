@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 import it.exercises.model.db.UserDB;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserDB, Integer>,JpaSpecificationExecutor<UserDB> {
+public interface UserRepository extends JpaRepository<UserDB, Long>,JpaSpecificationExecutor<UserDB> {
   
 }

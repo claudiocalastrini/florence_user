@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import it.exercises.interfaces.IUserService;
 import it.exercises.model.io.ResponseUser;
-import it.exercises.model.io.User;
+import it.exercises.model.io.UserIn;
 import it.exercises.validator.UserValidator;
 
 
@@ -39,11 +39,11 @@ public class UserController  {
 
 
 	public static final String GET_USER="getUserById/{idUtente}";
-	public static final String GET_USERS="findByCondition";
+	public static final String FIND_BY_CONDITION="findByCondition";
 
 
 	public static final String ADD_USER="addUser";
-	public static final String UPDATE_USER="updateUser";
+	public static final String UPDATE_USER="updateUser/{idUtente}";
 	
 	public static final String RESPONSE_ERROR = "{\"esito\": \"codiceErrore\",\"descrizioneErrore\":\"string\"}}";
 
@@ -57,14 +57,14 @@ public class UserController  {
 
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Operazione completata con successo", content = {
-					@Content(mediaType = "application/json", schema = @Schema(implementation = User.class)) }),
+					@Content(mediaType = "application/json", schema = @Schema(implementation = UserIn.class)) }),
 			@ApiResponse(responseCode = "412", description = "Errore di validazione", content = @Content(mediaType = "application/json", examples = {
-					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = User.class))),
+					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = UserIn.class))),
 			@ApiResponse(responseCode = "500", description = "Errore generico", content = @Content(mediaType = "application/json", examples = {
-					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = User.class))) })
+					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = UserIn.class))) })
 	@PostMapping(value = ADD_USER)
 	public ResponseEntity<ResponseUser> addUser(
-			@Parameter(description = "Utente", required = true) @RequestBody User user)
+			@Parameter(description = "Utente", required = true) @RequestBody UserIn user)
 			throws JsonMappingException, JsonProcessingException {
 
 		
@@ -86,17 +86,18 @@ public class UserController  {
 	
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Operazione completata con successo", content = {
-					@Content(mediaType = "application/json", schema = @Schema(implementation = User.class)) }),
+					@Content(mediaType = "application/json", schema = @Schema(implementation = UserIn.class)) }),
 			@ApiResponse(responseCode = "404", description = "Utente non trovato", content = @Content(mediaType = "application/json", examples = {
-					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = User.class))),
+					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = UserIn.class))),
 			@ApiResponse(responseCode = "412", description = "Errore di validazione", content = @Content(mediaType = "application/json", examples = {
-					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = User.class))),
+					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = UserIn.class))),
 			@ApiResponse(responseCode = "500", description = "Errore generico", content = @Content(mediaType = "application/json", examples = {
-					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = User.class))) })
+					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = UserIn.class))) })
 
 	@PutMapping(value = UPDATE_USER)
 	public ResponseEntity<ResponseUser> updateUser(
-			@Parameter(description = "Utente", required = true) @RequestBody User user)
+			@Parameter(description = "Utente", required = true) @RequestBody UserIn user,
+			@PathVariable(name = "idUtente", required = true) long idUtente)
 			throws JsonMappingException, JsonProcessingException {
 
 		
@@ -104,7 +105,7 @@ public class UserController  {
 		ResponseUser response= validator.validateUser(user);
 		if (response.getEsito().equals(UserValidator.OK)) {
 			try {
-				response.setUser(userService.updateUser(user));
+				response.setUser(userService.updateUser(user, idUtente));
 				if (response.getUser()==null) {
 					status=HttpStatus.NOT_FOUND;
 				}
@@ -120,13 +121,13 @@ public class UserController  {
 		return new ResponseEntity<>(response, status);
 	}
 	
-	@PostMapping(value = GET_USERS)
-	public ResponseEntity<List<User>> getUsers(@Parameter(description = "Utente", required = true) @RequestBody User user)
+	@PostMapping(value = FIND_BY_CONDITION)
+	public ResponseEntity<List<UserIn>> getUsers(@Parameter(description = "Utente", required = true) @RequestBody UserIn user)
 			throws JsonMappingException, JsonProcessingException {
 
 		
 		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-		List<User> retvalue=new ArrayList<User>();
+		List<UserIn> retvalue=new ArrayList<UserIn>();
 		try {
 			retvalue=userService.getByCondition(user);
 			status = HttpStatus.OK;
@@ -139,20 +140,20 @@ public class UserController  {
 	
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Operazione completata con successo", content = {
-					@Content(mediaType = "application/json", schema = @Schema(implementation = User.class)) }),
+					@Content(mediaType = "application/json", schema = @Schema(implementation = UserIn.class)) }),
 			@ApiResponse(responseCode = "404", description = "Utente non trovato", content = @Content(mediaType = "application/json", examples = {
-					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = User.class))),
+					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = UserIn.class))),
 			@ApiResponse(responseCode = "500", description = "Errore generico", content = @Content(mediaType = "application/json", examples = {
-					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = User.class))) })
+					@ExampleObject(value = RESPONSE_ERROR) }, schema = @Schema(implementation = UserIn.class))) })
 
 	@GetMapping(value = GET_USER)
-	public ResponseEntity<User> getUser(
-			@PathVariable(name = "idUtente", required = true) Integer idUtente)
+	public ResponseEntity<UserIn> getUser(
+			@PathVariable(name = "idUtente", required = true) long idUtente)
 			throws JsonMappingException, JsonProcessingException {
 
 		
 		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-		User utente=null;
+		UserIn utente=null;
 		try {
 			utente=userService.getUserById(idUtente);
 			if (utente==null) {

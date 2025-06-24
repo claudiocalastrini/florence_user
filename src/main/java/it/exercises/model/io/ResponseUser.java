@@ -1,15 +1,15 @@
 package it.exercises.model.io;
 
 public class ResponseUser {
-	private User user;
+	private UserOut user;
 	private String esito;
 	private String descrizioneErrore;
 	
 	
-	public User getUser() {
+	public UserOut getUser() {
 		return user;
 	}
-	public void setUser(User user) {
+	public void setUser(UserOut user) {
 		this.user = user;
 	}
 	public String getEsito() {

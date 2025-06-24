@@ -6,6 +6,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -14,9 +16,10 @@ import jakarta.persistence.TemporalType;
 @Table(name = "users")
 public class UserDB {
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id_user")
 	//nome, cognome, mail e indirizzo
-	private int userId;
+	private long userId;
 	@Column(name = "name")
 	private String name;
 	@Column(name = "surname")
@@ -33,11 +36,11 @@ public class UserDB {
 	//@CreationTimestamp
 	private Date date;
 
-	public int getUserId() {
+	public long getUserId() {
 		return userId;
 	}
 
-	public void setUserId(int userId) {
+	public void setUserId(long userId) {
 		this.userId = userId;
 	}
 

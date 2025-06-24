@@ -4,14 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import it.exercises.model.io.ResponseUser;
-import it.exercises.model.io.User;
+import it.exercises.model.io.UserIn;
 @Component
 public class UserValidator {
 	public static final String OK = "OK";
 	@Autowired MailValidator mailValidator;
 	//TODO aggiungere oggetto errore, con codice e descrizione
 	
-	public ResponseUser validateUser(User user) {
+	public ResponseUser validateUser(UserIn user) {
 		ResponseUser response=new ResponseUser();
 		response.setEsito(OK);
 		if (!mailValidator.isValidEmail(user.getMail())) {

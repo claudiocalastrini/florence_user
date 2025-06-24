@@ -22,13 +22,14 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import it.exercises.UserApplication;
-import it.exercises.model.io.User;
+import it.exercises.model.io.UserIn;
+import it.exercises.model.io.UserOut;
 import it.exercises.repository.UserRepository;
 import it.exercises.service.UserService;
 
 @SpringBootTest(classes = UserApplication.class)
 @AutoConfigureMockMvc
-class TestExercise3 {
+class TestExercise {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -44,21 +45,24 @@ class TestExercise3 {
 	}
 	@Test
 	void getAllUsers() throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+		String requestJson=ow.writeValueAsString(MockObjects.fillUserIn("mail@mail.it","cognome", "nome","indirizzo") );
+		this.mockMvc.perform(post("/users/findByCondition").contentType(MediaType.APPLICATION_JSON).content(requestJson)).andExpect(status().isOk());
 		
-		this.mockMvc.perform(get("/users/getAll")).andExpect(status().isOk());
 	}
 	
 	
 	@Test
-	void getAllUserById200() throws Exception {
-		User p=MockObjects.fillUser();
-		when(userService.getUserById(1)).thenReturn(p);
+	void getUserById200() throws Exception {
+		UserOut p=MockObjects.fillUserOut();
+		when(userService.getUserById(1l)).thenReturn(p);
 		this.mockMvc.perform(get("/users/getUserById/1")).andExpect(status().isOk()).andReturn().equals(p);
 	}
 	
 	
 	@Test
-	void getAllUserById404() throws Exception {
+	void getUserById404() throws Exception {
 	//	when(userService.getUserById(1)).thenReturn(new User());
 		this.mockMvc.perform(get("/users/getUserById/1")).andExpect(status().isNotFound());
 	}
@@ -68,7 +72,7 @@ class TestExercise3 {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mail@mail.it","cognome", "nome","indirizzo") );
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIn("mail@mail.it","cognome", "nome","indirizzo") );
 		this.mockMvc.perform(post("/users/addUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
         .andExpect(status().isOk());
 		
@@ -80,7 +84,7 @@ class TestExercise3 {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mailmail.it","cognome", "nome","indirizzo") );
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIn("mailmail.it","cognome", "nome","indirizzo") );
 		this.mockMvc.perform(post("/users/addUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
         .andExpect(status().isPreconditionFailed());
 		
@@ -91,7 +95,7 @@ class TestExercise3 {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mail@mail.it","A".repeat(101),"nome","indirizzo") );
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserOut(10,"mail@mail.it","A".repeat(101),"nome","indirizzo") );
 		this.mockMvc.perform(post("/users/addUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
         .andExpect(status().isPreconditionFailed());
 		
@@ -102,7 +106,7 @@ class TestExercise3 {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mail@mail.it","cognome","A".repeat(101),"indirizzo") );
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIn("mail@mail.it","cognome","A".repeat(101),"indirizzo") );
 		this.mockMvc.perform(post("/users/addUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
         .andExpect(status().isPreconditionFailed());
 		
@@ -113,7 +117,7 @@ class TestExercise3 {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mail@mail.it","cognome","nome","A".repeat(501)) );
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIn("mail@mail.it","cognome","nome","A".repeat(501)) );
 		this.mockMvc.perform(post("/users/addUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
         .andExpect(status().isPreconditionFailed());
 		
@@ -124,8 +128,8 @@ class TestExercise3 {
 		ObjectMapper mapper = new ObjectMapper();
 	    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
 	    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIo(10,"mail@mail.it","cognome", "nome","indirizzo") );
-		this.mockMvc.perform(put("/users/updateUser").contentType(MediaType.APPLICATION_JSON).content(requestJson))
+	    String requestJson=ow.writeValueAsString(MockObjects.fillUserIn("mail@mail.it","cognome", "nome","indirizzo") );
+		this.mockMvc.perform(put("/users/updateUser/999").contentType(MediaType.APPLICATION_JSON).content(requestJson))
         .andExpect(status().isNotFound());
 	}
 		

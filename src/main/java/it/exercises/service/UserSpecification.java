@@ -3,11 +3,11 @@ package it.exercises.service;
 import org.springframework.data.jpa.domain.Specification;
 
 import it.exercises.model.db.UserDB;
-import it.exercises.model.io.User;
+import it.exercises.model.io.UserIn;
 
 public class UserSpecification {
 
-    public static Specification<UserDB> build(User request) {
+    public static Specification<UserDB> build(UserIn request) {
         return (root, query, cb) -> {
             Specification<UserDB> spec = Specification.where(null);
 

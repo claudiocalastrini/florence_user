@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 
 import it.exercises.interfaces.IUserService;
 import it.exercises.model.db.UserDB;
-import it.exercises.model.io.User;
+import it.exercises.model.io.UserIn;
+import it.exercises.model.io.UserOut;
 import it.exercises.repository.UserRepository;
 
 @Service
@@ -21,13 +22,13 @@ public class UserService implements IUserService {
 	private UserRepository repository;
 	
 	@Override
-	public User addUser(User user) {
-		UserDB p=repository.save(fromIOToDb(user));
+	public UserOut addUser(UserIn user) {
+		UserDB p=repository.save(newUserToDb(user));
 		return fromDbToIo(p);
 	}
 
 	@Override
-	public List<User> getByCondition(User utenteIo) {
+	public List<UserIn> getByCondition(UserIn utenteIo) {
 		Specification<UserDB> spec = UserSpecification.build(utenteIo);
 
 		List<UserDB> utenti=repository.findAll(spec);
@@ -35,7 +36,7 @@ public class UserService implements IUserService {
 	}
  
 	@Override
-	public User getUserById(int userId) {
+	public UserOut getUserById(long userId) {
 		Optional<UserDB> p=repository.findById(userId);
 		if (!p.isPresent()) return null;
 		else return fromDbToIo(p.get());
@@ -43,7 +44,7 @@ public class UserService implements IUserService {
 
 	
 
-	private List<User> fillList(List<UserDB> utenti) {
+	private List<UserIn> fillList(List<UserDB> utenti) {
 		return utenti.stream().map(p -> fromDbToIo(p))
 		.collect(Collectors.toList());
 	}
@@ -51,13 +52,16 @@ public class UserService implements IUserService {
 	
 
 	@Override
-	public User updateUser(User user) {
-		if (repository.findById(user.getUserId()).isPresent()) return addUser(user);
+	public UserOut updateUser(UserIn user, long userId) {
+		if (repository.findById(userId).isPresent()) {
+			UserDB p=repository.save(fromIOToDb(user, userId));
+			return fromDbToIo(p);
+		}
 		else return null;
 	}
 
-	private User fromDbToIo(UserDB utente) {
-		User p=new User();
+	private UserOut fromDbToIo(UserDB utente) {
+		UserOut p=new UserOut();
 		p.setUserId(utente.getUserId());
 		p.setAddress(utente.getAddress());
 	
@@ -67,16 +71,23 @@ public class UserService implements IUserService {
 		return p;
 	}
 	
-	private UserDB fromIOToDb(User utente) {
+	private UserDB fromIOToDb(UserIn utente, long userId) {
 		UserDB p=new UserDB();
-		p.setUserId(utente.getUserId());
+		p.setUserId(userId);
 		p.setAddress(utente.getAddress());
 		p.setMail(utente.getMail());
 		p.setName(utente.getName());
 		p.setSurname(utente.getSurname());
 		return p;
 	}
-	
+	private UserDB newUserToDb(UserIn utente) {
+		UserDB p=new UserDB();
+		p.setAddress(utente.getAddress());
+		p.setMail(utente.getMail());
+		p.setName(utente.getName());
+		p.setSurname(utente.getSurname());
+		return p;
+	}
 	
 	
 }
